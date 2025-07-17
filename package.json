@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "inngest": "npx inngest-cli@latest dev",
     "start": "next start",
     "lint": "next lint"
   },
