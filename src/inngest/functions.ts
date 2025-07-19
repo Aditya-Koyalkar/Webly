@@ -55,7 +55,7 @@ export const generateUIWithAIandSandbox = inngest.createFunction(
         }),
         createTool({
           name: "createOrUpdateFiles",
-          description: "Create or ipdate files inside sandbox",
+          description: "Create or update files inside sandbox",
           parameters: z.object({
             files: z.array(
               z.object({
