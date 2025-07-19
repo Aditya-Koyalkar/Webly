@@ -5,12 +5,12 @@ import { createAgent, createNetwork, createTool, gemini, openai } from "@inngest
 import { z } from "zod";
 import { PROMPT } from "@/prompt";
 
-export const sandBoxTest = inngest.createFunction(
+export const generateUIWithAIandSandbox = inngest.createFunction(
   {
-    id: "sandbox-test",
+    id: "generate_ui_with_ai_and_sandbox",
   },
   {
-    event: "test/sandbox",
+    event: "ui_with_ai/sandbox",
   },
   async ({ event, step }) => {
     const sandboxId = await step.run("get-sandbox-id", async () => {
