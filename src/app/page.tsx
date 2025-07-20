@@ -10,8 +10,8 @@ import { toast } from "sonner";
 export default function Home() {
   const trpc = useTRPC();
   const [value, setValue] = useState("");
-  const aiMutate = useMutation(
-    trpc.messages.create.mutationOptions({
+  const createProject = useMutation(
+    trpc.projects.create.mutationOptions({
       onSuccess: () => {
         toast.success("AI has started building the web!!");
       },
@@ -21,20 +21,20 @@ export default function Home() {
     })
   );
   return (
-    <div>
-      <Input value={value} onChange={(e) => setValue(e.target.value)} />
-      <Button
-        onClick={async () => {
-          await aiMutate.mutate({
-            role: "USER",
-            type: "RESULT",
-            value: value,
-          });
-        }}
-        disabled={aiMutate.isPending}
-      >
-        Submit
-      </Button>
+    <div className="h-screen w-screen flex justify-center items-center">
+      <div className="max-w-7xl mx-auto flex items-center flex-col gap-y-4">
+        <Input value={value} onChange={(e) => setValue(e.target.value)} />
+        <Button
+          onClick={() => {
+            createProject.mutate({
+              value: value,
+            });
+          }}
+          disabled={createProject.isPending}
+        >
+          Submit
+        </Button>
+      </div>
     </div>
   );
 }

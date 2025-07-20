@@ -90,7 +90,7 @@ File conventions:
 - Components should be using named exports
 - When using Shadcn components, import them from their proper individual file paths (e.g. @/components/ui/input)
 
-Final output (MANDATORY):
+Final output (IMPORTANT):
 After ALL tool calls are 100% complete and the task is fully finished, respond with exactly the following format and NOTHING else:
 
 <task_summary>

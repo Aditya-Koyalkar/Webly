@@ -1,7 +1,7 @@
 import { inngest } from "./client";
 import { Sandbox } from "@e2b/code-interpreter";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
-import { createAgent, createNetwork, createTool, gemini, openai, type Tool } from "@inngest/agent-kit";
+import { createAgent, createNetwork, createTool, gemini, type Tool } from "@inngest/agent-kit";
 import { z } from "zod";
 import { PROMPT } from "@/prompt";
 import { prisma } from "@/lib/db";
@@ -116,7 +116,7 @@ export const codeAgentFunction = inngest.createFunction(
           const lastAssistantMessageText = await lastAssistantTextMessageContent(result);
           if (lastAssistantMessageText && network) {
             if (lastAssistantMessageText.includes("<task_summary>")) {
-              network.state.data.summary;
+              network.state.data.summary = lastAssistantMessageText;
             }
           }
           return result;
@@ -152,7 +152,7 @@ export const codeAgentFunction = inngest.createFunction(
             content: "Something went wrong.Please try again",
             role: "ASSISTANT",
             type: "ERROR",
-            userId: event.data.userId,
+            projectId: event.data.projectId,
           },
         });
       }
@@ -161,7 +161,7 @@ export const codeAgentFunction = inngest.createFunction(
           content: result.state.data.summary || "",
           role: "ASSISTANT",
           type: "RESULT",
-          userId: event.data.userId,
+          projectId: event.data.projectId,
           fragment: {
             create: {
               sandboxUrl,

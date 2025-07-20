@@ -7,43 +7,48 @@ export const messagesRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        value: z.string().min(1, { message: "Message is required" }),
-        role: z.enum(["ASSISTANT", "USER"]),
-        type: z.enum(["ERROR", "RESULT"]),
+        projectId: z.string().min(1, { message: "Project is required" }),
+        value: z.string().min(1, { message: "Value is required" }).max(10000, { message: "Value is too long.." }),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       const createdMessage = await prisma.message.create({
         data: {
+          projectId: input.projectId,
           content: input.value,
-          userId: ctx.auth.user.id,
-          role: input.role,
-          type: input.type,
+          role: "USER",
+          type: "RESULT",
         },
       });
-      if (input.role === "USER" && input.type === "RESULT") {
-        await inngest.send({
-          name: "code-agent/run",
-          data: {
-            value: input.value,
-            userId: ctx.auth.user.id,
-          },
-        });
-      }
+
+      await inngest.send({
+        name: "code-agent/run",
+        data: {
+          value: input.value,
+          projectId: input.projectId,
+        },
+      });
+
       return createdMessage;
     }),
-  getMany: protectedProcedure.query(async ({ ctx }) => {
-    const messages = await prisma.message.findMany({
-      where: {
-        userId: ctx.auth.user.id,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-      include: {
-        fragment: true,
-      },
-    });
-    return messages;
-  }),
+  getMany: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().min(1, { message: "ProjectId is required" }),
+      })
+    )
+    .query(async ({ input }) => {
+      const messages = await prisma.message.findMany({
+        where: {
+          projectId: input.projectId,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        include: {
+          fragment: true,
+        },
+      });
+      return messages;
+    }),
 });

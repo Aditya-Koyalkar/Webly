@@ -22,6 +22,9 @@ model Project {
   updatedAt DateTime @updatedAt
 
   messages Message[]
+  
+  userId String 
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 
@@ -45,9 +48,6 @@ model Message {
 
   projectId String
   project Project @relation(fields: [projectId],references: [id],onDelete: Cascade)
-
-  userId String 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 
   fragment Fragment?
 }
@@ -81,7 +81,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
-  messages      Message[]
+  projects      Project[]
 
   @@unique([email])
   @@map("user")
