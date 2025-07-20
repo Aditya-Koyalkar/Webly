@@ -1,16 +1,22 @@
 import { inngest } from "./client";
 import { Sandbox } from "@e2b/code-interpreter";
 import { getSandbox, lastAssistantTextMessageContent } from "./utils";
-import { createAgent, createNetwork, createTool, gemini, openai } from "@inngest/agent-kit";
+import { createAgent, createNetwork, createTool, gemini, openai, type Tool } from "@inngest/agent-kit";
 import { z } from "zod";
 import { PROMPT } from "@/prompt";
+import { prisma } from "@/lib/db";
 
-export const generateUIWithAIandSandbox = inngest.createFunction(
+interface AgentState {
+  summary: string;
+  files: { [key: string]: string };
+}
+
+export const codeAgentFunction = inngest.createFunction(
   {
-    id: "generate_ui_with_ai_and_sandbox",
+    id: "code-agent",
   },
   {
-    event: "ui_with_ai/sandbox",
+    event: "code-agent/run",
   },
   async ({ event, step }) => {
     const sandboxId = await step.run("get-sandbox-id", async () => {
@@ -18,7 +24,7 @@ export const generateUIWithAIandSandbox = inngest.createFunction(
       return sandbox.sandboxId;
     });
 
-    const codeAgent = createAgent({
+    const codeAgent = createAgent<AgentState>({
       name: "frontend_engineer",
       model: gemini({
         model: "gemini-2.0-flash",
@@ -64,7 +70,7 @@ export const generateUIWithAIandSandbox = inngest.createFunction(
               })
             ),
           }),
-          handler: async ({ files }, { step, network }) => {
+          handler: async ({ files }, { step, network }: Tool.Options<AgentState>) => {
             const newFiles = await step?.run("createOrUpdateFiles", async () => {
               try {
                 const updatedFiles = network.state.data.files || [];
@@ -117,7 +123,7 @@ export const generateUIWithAIandSandbox = inngest.createFunction(
         },
       },
     });
-    const network = createNetwork({
+    const network = createNetwork<AgentState>({
       name: "conding_agent_network",
       agents: [codeAgent],
       maxIter: 15,
@@ -132,11 +138,41 @@ export const generateUIWithAIandSandbox = inngest.createFunction(
 
     const result = await network.run(event.data.value);
 
+    const isError = !result.state.data.summary || Object.keys(result.state.data.files || {}).length === 0;
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandbox(sandboxId);
       const host = sandbox.getHost(3000);
       return `https://${host}`;
     });
+
+    await step.run("save-result", async () => {
+      if (isError) {
+        return await prisma.message.create({
+          data: {
+            content: "Something went wrong.Please try again",
+            role: "ASSISTANT",
+            type: "ERROR",
+            userId: event.data.userId,
+          },
+        });
+      }
+      await prisma.message.create({
+        data: {
+          content: result.state.data.summary || "",
+          role: "ASSISTANT",
+          type: "RESULT",
+          userId: event.data.userId,
+          fragment: {
+            create: {
+              sandboxUrl,
+              title: "Fragment",
+              files: result.state.data.files,
+            },
+          },
+        },
+      });
+    });
+
     return { url: sandboxUrl, title: "Fragment", files: result.state.data.files, summary: result.state.data.summary };
   }
 );
