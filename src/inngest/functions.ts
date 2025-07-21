@@ -8,7 +8,9 @@ import { prisma } from "@/lib/db";
 
 interface AgentState {
   summary: string;
-  files: { [key: string]: string };
+  files: {
+    [key: string]: string;
+  };
 }
 
 export const codeAgentFunction = inngest.createFunction(
@@ -73,17 +75,18 @@ export const codeAgentFunction = inngest.createFunction(
           handler: async ({ files }, { step, network }: Tool.Options<AgentState>) => {
             const newFiles = await step?.run("createOrUpdateFiles", async () => {
               try {
-                const updatedFiles = network.state.data.files || [];
+                const updatedFiles = network.state.data.files || {};
                 const sandbox = await getSandbox(sandboxId);
                 for (const file of files) {
                   await sandbox.files.write(file.path, file.content);
+                  updatedFiles[file.path] = file.content;
                 }
                 return updatedFiles;
               } catch (e) {
                 return "Error :" + e;
               }
             });
-            if (typeof newFiles == "object") {
+            if (typeof newFiles === "object") {
               network.state.data.files = newFiles;
             }
           },
