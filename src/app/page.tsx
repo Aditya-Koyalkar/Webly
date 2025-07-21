@@ -4,16 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Home() {
+  const router = useRouter();
   const trpc = useTRPC();
   const [value, setValue] = useState("");
   const createProject = useMutation(
     trpc.projects.create.mutationOptions({
-      onSuccess: () => {
-        toast.success("AI has started building the web!!");
+      onSuccess: (data) => {
+        router.push(`/projects/${data.id}`);
       },
       onError: (e) => {
         toast.error("Error" + e.message);
@@ -32,7 +35,7 @@ export default function Home() {
           }}
           disabled={createProject.isPending}
         >
-          Submit
+          {createProject.isPending ? "Submitting" : "Submit"} {createProject.isPending && <Loader2 className="w-5 animate-spin" />}
         </Button>
       </div>
     </div>
