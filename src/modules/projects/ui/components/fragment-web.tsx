@@ -1,7 +1,8 @@
+import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { Fragment } from "@/generated/prisma";
 import { da } from "date-fns/locale";
-import { RefreshCcwIcon } from "lucide-react";
+import { ExternalLinkIcon, RefreshCcwIcon } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -26,27 +27,27 @@ export const FragementWeb = ({ data }: Props) => {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="p-2 border-b bg-sidebar flex items-center gap-x-2">
-        <Button size={"sm"} variant={"outline"} onClick={onRefresh}>
-          <RefreshCcwIcon />
-        </Button>
-        <Button
-          disabled={!data.sandboxUrl || copied}
-          size={"sm"}
-          variant={"outline"}
-          onClick={handleCopy}
-          className="flex-1 justify-start  font-normal"
-        >
-          <span className="truncate">{data.sandboxUrl}</span>
-        </Button>{" "}
-        <Button
-          size={"sm"}
-          variant={"outline"}
-          onClick={() => {
-            if (data.sandboxUrl) window.open(data.sandboxUrl, "_blank");
-          }}
-        >
-          Open in new tab
-        </Button>
+        <Hint text="Refresh" side="bottom" align="start">
+          <Button size={"sm"} variant={"outline"} onClick={onRefresh}>
+            <RefreshCcwIcon />
+          </Button>
+        </Hint>
+        <Hint text={"Click to Copy"} side="bottom" align="start">
+          <Button size={"sm"} variant={"outline"} onClick={handleCopy}>
+            <span className="truncate">{data.sandboxUrl}</span>
+          </Button>
+        </Hint>
+        <Hint text="Open in a new tab" side="bottom" align="start">
+          <Button
+            size={"sm"}
+            variant={"outline"}
+            onClick={() => {
+              if (data.sandboxUrl) window.open(data.sandboxUrl, "_blank");
+            }}
+          >
+            <ExternalLinkIcon className="size-4" />
+          </Button>
+        </Hint>
       </div>
       <iframe
         key={fragmentKey}
