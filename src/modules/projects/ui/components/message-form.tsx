@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,21 +65,25 @@ export const MessageForm = ({ projectId }: Props) => {
             name="value"
             control={form.control}
             render={({ field }) => (
-              <TextareAutosize
-                className="pt-4 resize-none border-none w-full outline-none bg-transparent"
-                {...field}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                minRows={2}
-                maxRows={8}
-                placeholder="What would you like to build?"
-                onKeyDown={(e) => {
-                  if (e.key == "Enter" && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    form.handleSubmit(onSubmit)(e);
-                  }
-                }}
-              />
+              <FormItem>
+                <FormControl>
+                  <TextareAutosize
+                    className="pt-4 resize-none border-none w-full outline-none bg-transparent"
+                    {...field}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    minRows={2}
+                    maxRows={8}
+                    placeholder="What would you like to build?"
+                    onKeyDown={(e) => {
+                      if (e.key == "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        form.handleSubmit(onSubmit)(e);
+                      }
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
             )}
           />
           <div className="flex gap-x-2 items-end justify-between pt-2">
@@ -89,7 +93,7 @@ export const MessageForm = ({ projectId }: Props) => {
               </kbd>
               &nbsp; to submit
             </div>
-            <Button disabled={isDisabled} className={cn("size-8 rounded-full", isDisabled && "bg-muted-foreground border")}>
+            <Button type="submit" disabled={isDisabled} className={cn("size-8 rounded-full", isDisabled && "bg-muted-foreground border")}>
               {createMessage.isPending ? <Loader2Icon className="animate-spin" /> : <ArrowUpIcon />}
             </Button>
           </div>
