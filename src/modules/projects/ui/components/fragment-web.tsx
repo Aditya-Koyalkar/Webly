@@ -33,7 +33,7 @@ export const FragementWeb = ({ data }: Props) => {
           </Button>
         </Hint>
         <Hint text={"Click to Copy"} side="bottom" align="start">
-          <Button size={"sm"} variant={"outline"} onClick={handleCopy}>
+          <Button disabled={copied || !data.sandboxUrl} size={"sm"} variant={"outline"} onClick={handleCopy} className="flex-1 justify-start">
             <span className="truncate">{data.sandboxUrl}</span>
           </Button>
         </Hint>
