@@ -36,7 +36,7 @@ export const ProjectHeader = ({ projectId }: { projectId: string }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="start">
           <DropdownMenuItem asChild>
-            <Link href={"/"}>
+            <Link href={"/projects"}>
               <ChevronLeftIcon className="size-4" />
               <span>Go to Dashboard</span>
             </Link>

@@ -1,9 +1,18 @@
+import { auth } from "@/lib/auth";
 import { ProjectForm } from "@/modules/home/components/project-form";
+import { headers } from "next/headers";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
-const Page = () => {
+const Page = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session || !session.user) {
+    redirect("/sign-in");
+  }
   return (
-    <div className="flex flex-col max-w-5xl mx-auto w-full">
+    <div className="flex flex-col w-full ">
       <section className="space-y-6 py-[16vh] 2xl:py-48">
         <div className="flex flex-col items-center ">
           <Image src={"/logo.svg"} alt="Webly Logo" width={50} height={50} />
