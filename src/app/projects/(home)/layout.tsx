@@ -10,7 +10,7 @@ type Props = {
 const Layout = ({ children }: Props) => {
   return (
     <div className="flex min-h-screen max-h-screen">
-      <div className="max-w-64 shrink-0">
+      <div className="w-64 shrink-0">
         {" "}
         <SidebarProvider>
           <Suspense fallback={<>Loading projects...</>}>

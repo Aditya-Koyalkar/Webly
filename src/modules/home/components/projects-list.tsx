@@ -11,7 +11,7 @@ import { PanelLeftCloseIcon } from "lucide-react";
 export const ProjectsList = () => {
   const trpc = useTRPC();
   const { toggleSidebar } = useSidebar();
-  const { data: projects } = useQuery(trpc.projects.getMany.queryOptions());
+  const { data: projects, isLoading } = useQuery(trpc.projects.getMany.queryOptions());
 
   return (
     <Sidebar>
@@ -27,6 +27,15 @@ export const ProjectsList = () => {
         <Separator className="text-accent-foreground" />
       </div>
       <SidebarContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        ) : projects?.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground"> Create a new project to get started.</p>
+          </div>
+        ) : null}
         <SidebarMenu className="gap-y-2 overflow-y-auto">
           {projects?.map((project) => (
             <SidebarMenuButton key={project.id} asChild>
